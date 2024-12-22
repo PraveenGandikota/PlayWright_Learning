@@ -1,0 +1,217 @@
+    PlayWright
+----------------
+-Applications Supported -  Web browser apps, mobile web apps, API
+
+-Languaes supported - Javascript, Typescript, Java, Python & .Net(C#)
+
+-Browsers Supported - chromium, WebKit(Safari) and firefox(headed/headless)
+
+-OS Supported -Windows, MacOS, Linux, Support CI Runs
+
+Features Plyawright:
+------------------
+-Free & Open Source
+-Multi-Browser, Multi-Language,
+-Easy setup and configuration
+-Functional, API, accessibility testing
+-Built-in reporters, custom reports
+-CI, CD, Docker
+-Parallel Testing
+-Auto Wait
+-Buil in assertions
+-Mutli tab & mutli window
+-Frames(i Frames), shadow dom
+-Test parameter
+-Emulate mobile devices
+-Fast 
+---------------------------
+
+Pre-requitites:
+-Nodejs
+-Vs Code
+then 
+-Create project folder -->Open in VScode
+-Install Playwright (either through in Command line or Extensions...)
+   in Terminal(npm init playwright@latest)
+
+fOR RUN PLAYWRIGHT test:
+-npx playwright test
+(this run in headless mode which means it runs backgroundly and we can't seen any actions)
+for TO SEE THE RESULTS in BROWSERS RUN:
+-npx playwright test --headed
+-npx playwright show-report (it is used to see the HTML Files)
+
+
+Some files automatically downloaded like:
+   -package.json --node project management file
+   -playwright.config.js --playwright configuration
+   -tests --we can all the playwright tests
+
+  npm playwright -v ---return install version of playwright.
+
+2nd way to Install Playwright using VS Code:
+ --go to extensions
+ --search playwright(microsoft--Run Playwright Test tests in Visual Studio Code.)
+ --now, go to view then selet command pallate and then search playwright and select javascript along with others options)
+-----------------------------------------------
+How to create and run playwrite tests:
+->we can write in 2 ways:
+ 1.codeGenerator plugin (Test generator)
+ 2.writing our own script
+
+--> All the tests should we write in Tests:
+    > we need to create the file with specified with .spec.js (Ex: HomePageTest.spec.js)
+    > for that we need to import (const {test, except} = require('@playwright/test');
+    EX: code for extracting title
+    |--------------------------------------------------------------------
+    | const { test, expect } = require('@playwright/test')              |
+    | test('Home Page', async ({ page }) => {                           |
+    | await page.goto('https://www.demoblaze.com/index.html')           |
+    |// Get and log the page title                                      |
+    | const pageTitle = await page.title()                              |
+    | console.log('Page title is:', pageTitle)
+    | // Assert the page title
+    | await expect(page).toHaveTitle('STORE')                           |
+    | // Get and log the page URL
+    | const pageUrl = await page.url()
+    | console.log('Page URL is:', pageUrl)                              |
+
+    | // Assert the page URL
+    | await expect(page).toHaveURL('https://www.demoblaze.com/index.html')
+ 
+    |  // Close the page                                                |
+    | await page.close()
+    | })                                                                |
+    |-------------------------------------------------------------------                                                                   
+
+    >Then open Commandline and start it (npx playwright test)(it runs all cases in the file , for to run a single file:)
+    >Run : npx playwright test filename.spec.js and for report(npx playwright show-report)
+-------------------------------------------------------
+Run Playwrite Tests:
+->npx playwright test        <>runs all tests on all browsers in headless mode 
+->npx playwright test MyTest.spec.js  <>runs a specific test file
+->npx playwright test MyTest.spec.js --project=chromium    <>runs on specific browser
+->npx playwright test MyTest.spec.js --project=chromium --headed 
+-> npx playwright test MyTest.spec.js --project=chromium --headed --debug   <> for debuging annd line by line
+
+Locating ELements in Playwright:
+-->Property
+-->CSS
+-->Xpath
+----------------
+Locate single element :
+->Link/button>
+ -|await page.locator('locator').click();| or 2nd way:
+ -|await click('button#submit');|
+--Locates a button with the ID submit and clicks it.
+{     Performs: Clicks an element on the page.
+      Use Case: Automates interaction with web elements.
+      Key Points:
+      await waits for the click to complete.
+      locator('locator') identifies the element.
+      .click() triggers the action.
+}
+->inputbox:
+  -|await page.locator('locator').fill('value');| or 2nd way:
+  -|await page.locator('locator').type('value'); 
+
+  -|await page.fill('locator','value');
+  -|await page.type('locator', 'value');
+
+Example: Locators.spec.js
+  |-----------------------------------------------------------------------
+  |    import { test, expect } from '@playwright/test'                   |
+
+	test('Locators', async ({ page }) => {                           |
+        // Navigate to the website
+        await page.goto('https://www.demoblaze.com/index.html')
+  |
+  	// Click on the login button - property                          |
+  	await page.click('#login2')
+
+  	// Provide username - CSS
+  |	await page.fill('#loginusername', 'pavanol')
+
+  	// Provide password - CSS
+	
+  |	await page.fill("input[id='loginpassword']", 'test@123')         |
+
+  	// Click on login button - XPath
+  	await page.click("//button[normalize-space()='Log in']")         |
+  |
+  	// Verify logout link presence
+  	const logoutLink = page.locator("//a[normalize-space()='Log out']")
+  	await expect(logoutLink).toBeVisible()
+   |
+  	// Close the page
+  	await page.close()                                               |
+	})
+   |_____________________________________________________________________|
+
+Locate mutliple web elements:
+  >const elements = await page.$$(locator);
+EX: |-----------------------------------------------------------------------
+    |	import { test, expect } from '@playwright/test'                    |
+
+    |	test('LocateMutlipleElements', async ({ page }) => {
+  	// Navigate to the website                                         |
+    |	await page.goto('https://www.demoblaze.com/index.html')
+
+ 	 const links = await page.$$('a')                                 |
+    |	//iterating over all items
+  	for (let link of links) {
+    |	 const linktext = await link.textContent()                          |
+   	 console.log(linktext)
+    |	}	
+        page.waitForSelector("//div[@id='tbodyid']//div//h4/a")
+  	//extracting products:
+  	const products = await page.$$("//div[@id='tbodyid']//div//h4/a")   |
+    |	for (const product of products) {
+    	const productName = await product.textContent()                     |
+    	console.log(productName)
+    |	}
+  	// Close the page                                                   |
+    |	 await page.close()
+	})                                                                  |
+    |_________________________________________________________________-______
+
+Built-in Locators:
+ 
+ page.getByRole() to locate by explicit and implicit accessibility attributes.
+ page.getByText() to locate by text content.
+ page.getByLabel() to locate a form control by associated label's text.
+ page.getByPlaceholder() to locate an input by placeholder.
+ page.getByAltText() to locate an element, usually image, by its text alternative.
+ page.getByTitle() to locate an element by its title attribute.
+ page.getByTestId() to locate an element based on its data-testid attribute (other attributes can be configured).
+
+Ex:
+     await page.getByLabel('User Name').fill('John');
+     await page.getByLabel('Password').fill('secret-password');
+     await page.getByRole('button', { name: 'Sign in' }).click();
+     await expect(page.getByText('Welcome, John!')).toBeVisible();
+------------------------------------------
+Code Generator:
+ ~| npx playwright codegen |
+|->it pop-up's 2 windows -1.playwright inspector (where all interactions recorded)(pick locator ->used to select your wishing locators)
+|-> 2.tab(then enter you https address) started functionalaties:
+
+->in target in inspector you can select type of language(nodejs, java, python...)
+->the above steps are manual, where we should copy the code from inspector and creating an file and then pasted:
+
+For More Options: ~| npx playwright codegen --help |
+
+For Directly writtening of code in file :
+ |>>npx playwright codegen -o tests/devEms.spec.js  (or) (it creates the file with the given name)
+ |>>npx playwright codegen -output tests/devEms.spec.js
+
+for runing: 
+ |>>npx playwright codegen --target javascript (for specific language)
+ |>>npx playwright codegen --browser chromium (for specific browser)
+
+For specific Devices:
+ |>>npx playwright codegem --device "iPhone 12"
+
+For Specific Screen Sizes:
+ |>>npx playwright codegen --viewport-size "1280, 720"
+
